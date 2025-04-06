@@ -2,6 +2,10 @@ package org.example.paymentservice.event.handler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.commonevents.dto.PaymentRequest;
+import org.example.commonevents.event.OrderEvent;
+import org.example.commonevents.event.PaymentEvent;
+import org.example.paymentservice.service.PaymentService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -18,16 +22,14 @@ public class OrderEventHandler {
         log.info("Received order event: {}", orderEvent);
 
         try {
-            // Попытка обработки платежа
             PaymentRequest paymentRequest = PaymentRequest.builder()
                     .orderId(orderEvent.getOrderId())
                     .userId(orderEvent.getUserId())
-                    .amount(orderEvent.getQuantity() * 100) // Упрощенная логика расчета суммы
+                    .amount((double) (orderEvent.getQuantity() * 100))
                     .build();
 
             paymentService.processPayment(paymentRequest);
 
-            // Отправка успешного события
             PaymentEvent paymentEvent = PaymentEvent.builder()
                     .orderId(orderEvent.getOrderId())
                     .status("PAYMENT_COMPLETED")
@@ -37,7 +39,6 @@ public class OrderEventHandler {
         } catch (Exception e) {
             log.error("Payment processing failed: {}", e.getMessage());
 
-            // Отправка события об ошибке
             PaymentEvent paymentEvent = PaymentEvent.builder()
                     .orderId(orderEvent.getOrderId())
                     .status("PAYMENT_FAILED")

@@ -1,7 +1,11 @@
-package org.example.ticketservice.event.event;
+package org.example.ticketservice.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.example.commonevents.dto.TicketRequest;
+import org.example.commonevents.event.PaymentEvent;
+import org.example.commonevents.event.TicketEvent;
+import org.example.ticketservice.service.TicketService;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
@@ -19,17 +23,14 @@ public class PaymentEventHandler {
 
         if ("PAYMENT_COMPLETED".equals(paymentEvent.getStatus())) {
             try {
-                // Здесь должна быть логика получения информации о заказе
-                // Для упрощения используем фиктивные данные
                 TicketRequest ticketRequest = TicketRequest.builder()
                         .orderId(paymentEvent.getOrderId())
-                        .userId(1L) // Фиктивный userId
-                        .quantity(1) // Фиктивное количество
+                        .userId(1L)
+                        .quantity(1)
                         .build();
 
                 ticketService.createTicket(ticketRequest);
 
-                // Отправка успешного события
                 TicketEvent ticketEvent = TicketEvent.builder()
                         .orderId(paymentEvent.getOrderId())
                         .status("TICKET_CREATED")
@@ -39,7 +40,6 @@ public class PaymentEventHandler {
             } catch (Exception e) {
                 log.error("Ticket creation failed: {}", e.getMessage());
 
-                // Отправка события об ошибке
                 TicketEvent ticketEvent = TicketEvent.builder()
                         .orderId(paymentEvent.getOrderId())
                         .status("TICKET_CREATION_FAILED")

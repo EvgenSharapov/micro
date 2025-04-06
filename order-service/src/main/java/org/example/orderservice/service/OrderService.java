@@ -1,9 +1,15 @@
 package org.example.orderservice.service;
 
 import lombok.RequiredArgsConstructor;
+import org.example.commonevents.dto.OrderRequest;
+import org.example.commonevents.dto.OrderResponse;
+import org.example.commonevents.event.OrderEvent;
+import org.example.orderservice.model.Order;
+import org.example.orderservice.repository.OrderRepository;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
 @RequiredArgsConstructor
@@ -22,7 +28,6 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        // Отправка события в Kafka
         OrderEvent event = OrderEvent.builder()
                 .orderId(savedOrder.getId())
                 .userId(savedOrder.getUserId())

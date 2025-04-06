@@ -1,5 +1,8 @@
 package org.example.orderservice.controller;
 
+import lombok.RequiredArgsConstructor;
+import org.example.commonevents.dto.OrderRequest;
+import org.example.commonevents.dto.OrderResponse;
 import org.example.orderservice.service.OrderService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
